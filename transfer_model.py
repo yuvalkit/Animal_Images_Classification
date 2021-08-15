@@ -37,7 +37,7 @@ def get_x_and_y_from_dataset():
         dir_path = os.path.join(dataset_path, category)
         for file_name in os.listdir(dir_path):
             file_path = os.path.join(dir_path, file_name)
-            image = cv2.imread(file_path)
+            image = cv2.cvtColor(cv2.imread(file_path), cv2.COLOR_BGR2RGB)
             resized_img = cv2.resize(image, (image_size, image_size))
             x.append(resized_img)
             y.append(categories.index(category))
