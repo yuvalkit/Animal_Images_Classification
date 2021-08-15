@@ -8,7 +8,6 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
-import time
 
 dataset_path = 'dataset'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'
@@ -32,16 +31,11 @@ num_channels = 3
 
 
 def get_x_and_y_from_dataset():
-    start = time.time()
     x = []
     y = []
     for category in categories:
-        count = 0
         dir_path = os.path.join(dataset_path, category)
         for file_name in os.listdir(dir_path):
-            if count > 10:
-                break
-            count += 1
             file_path = os.path.join(dir_path, file_name)
             image = cv2.imread(file_path)
             resized_img = cv2.resize(image, (image_size, image_size))
@@ -49,8 +43,6 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
-    end = time.time()
-    print(f'load time: {end - start}')
     return x, y
 
 
@@ -59,16 +51,13 @@ def save_x_and_y_to_file(x, y):
 
 
 def load_x_and_y_from_file():
-    start = time.time()
     npz = np.load(dataset_numpy_path)
     x = npz['arr_0']
     y = npz['arr_1']
-    end = time.time()
-    print(f'load time: {end - start}')
     return x, y
 
 
-def get_vgg16_model():
+def get_model():
     base_model = ResNet152(input_shape=(image_size, image_size, num_channels),
                            include_top=False, weights='imagenet')
 
@@ -147,19 +136,12 @@ def save_results_to_file(file_name, fit_log, test_results):
 def main():
     x, y = get_x_and_y_from_dataset()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-
-    model = get_vgg16_model()
-
-    # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=1,
-    #                               verbose=1, min_delta=0.0001, min_lr=1e-8)
+    model = get_model()
 
     fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=10, batch_size=64)
-
     test_results = model.evaluate(x_test, y_test, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
-
-    plot_fit_log(fit_log)
 
 
 if __name__ == '__main__':

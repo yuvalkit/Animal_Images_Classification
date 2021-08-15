@@ -6,7 +6,6 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, Dense, Conv2D, 
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
-import time
 
 
 dataset_path = 'dataset'
@@ -29,7 +28,6 @@ num_channels = 3
 
 
 def get_x_and_y_from_dataset():
-    start = time.time()
     x = []
     y = []
     for category in categories:
@@ -42,8 +40,6 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
-    end = time.time()
-    print(f'load time: {end - start}')
     return x, y
 
 
@@ -52,16 +48,13 @@ def save_x_and_y_to_file(x, y, file_path):
 
 
 def load_x_and_y_from_file(file_path):
-    start = time.time()
     npz = np.load(file_path)
     x = npz['arr_0']
     y = npz['arr_1']
-    end = time.time()
-    print(f'load time: {end - start}')
     return x, y
 
 
-def get_cnn_model():
+def get_model():
     model = Sequential([
         Conv2D(filters=128, kernel_size=(3, 3), activation='relu',
                input_shape=(image_size, image_size, num_channels)),
@@ -151,16 +144,12 @@ def save_results_to_file(file_name, fit_log, test_results):
 def main():
     x, y = get_x_and_y_from_dataset()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-
-    model = get_cnn_model()
+    model = get_model()
 
     fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=20, batch_size=64)
-
     test_results = model.evaluate(x_test, y_test, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
-
-    plot_fit_log(fit_log)
 
 
 if __name__ == '__main__':
