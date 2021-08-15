@@ -9,7 +9,7 @@ from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 
-dataset_path = 'dataset'
+dataset_path = '/home/access/yuval_projects/data/Animals-10'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'
 
 dataset_numpy_path = 'dataset_numpy.npz'
