@@ -1,0 +1,125 @@
+import os
+import numpy as np
+import cv2
+from tensorflow.keras.applications import ResNet152
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+from tensorflow.keras import optimizers
+from sklearn.model_selection import train_test_split
+from matplotlib import pyplot as plt
+import time
+
+# dataset_path = 'dataset'
+dataset_path = '/content/PracticalML_FinalProject/dataset'
+
+# dataset_numpy_path = 'dataset_numpy.npz'
+dataset_numpy_path = '/content/drive/MyDrive/PracticalML_FinalProject/dataset_numpy.npz'
+
+categories = ['butterfly',
+              'cat',
+              'chicken',
+              'cow',
+              'dog',
+              'elephant',
+              'horse',
+              'sheep',
+              'spider',
+              'squirrel']
+
+image_size = 224
+num_channels = 3
+
+
+def get_x_and_y_from_dataset():
+    start = time.time()
+    x = []
+    y = []
+    for category in categories:
+        dir_path = os.path.join(dataset_path, category)
+        for file_name in os.listdir(dir_path):
+            file_path = os.path.join(dir_path, file_name)
+            image = cv2.imread(file_path)
+            resized_img = cv2.resize(image, (image_size, image_size))
+            x.append(resized_img)
+            y.append(categories.index(category))
+    x = np.array(x).reshape((-1, image_size, image_size, num_channels))
+    y = np.array(y)
+    end = time.time()
+    print(f'load time: {end - start}')
+    return x, y
+
+
+def save_x_and_y_to_file(x, y):
+    np.savez(dataset_numpy_path, x, y)
+
+
+def load_x_and_y_from_file():
+    start = time.time()
+    npz = np.load(dataset_numpy_path)
+    x = npz['arr_0']
+    y = npz['arr_1']
+    end = time.time()
+    print(f'load time: {end - start}')
+    return x, y
+
+
+def get_vgg16_model():
+    base_model = ResNet152(input_shape=(image_size, image_size, num_channels),
+                           include_top=False, weights='imagenet')
+
+    base_model.trainable = False
+
+    x = Flatten()(base_model.output)
+    x = Dropout(0.1)(x)
+    x = Dense(256, activation='relu')(x)
+    x = Dropout(0.1)(x)
+
+    outputs = Dense(len(categories), activation='softmax')(x)
+
+    model = Model(inputs=base_model.input, outputs=outputs)
+
+    model.compile(optimizer=optimizers.SGD(learning_rate=0.001, momentum=0.9),
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    return model
+
+
+def plot_fit_metric(fit_log, metric):
+    plt.plot(fit_log.history[metric])
+    plt.plot(fit_log.history[f'val_{metric}'])
+    plt.title(f'model {metric}')
+    plt.ylabel(metric)
+    plt.xlabel('epoch')
+    plt.legend(['train', 'val'])
+    plt.show()
+
+
+def plot_fit_log(fit_log):
+    print()
+    plot_fit_metric(fit_log, 'loss')
+    print()
+    plot_fit_metric(fit_log, 'accuracy')
+    print()
+
+
+def main():
+    x, y = get_x_and_y_from_dataset()
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+
+    model = get_vgg16_model()
+
+    # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=1,
+    #                               verbose=1, min_delta=0.0001, min_lr=1e-8)
+
+    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=10, batch_size=64)
+
+    plot_fit_log(fit_log)
+
+    print('test:')
+    model.evaluate(x_test, y_test, verbose=1)
+
+
+if __name__ == '__main__':
+    main()
