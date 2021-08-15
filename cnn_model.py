@@ -122,6 +122,32 @@ def plot_fit_log(fit_log):
     print()
 
 
+def write_results_to_file(file, results_arr, title):
+    file.write(f'{title}:\n')
+    for i, elem in enumerate(results_arr):
+        file.write(f'{i + 1}: {elem}\n')
+    file.write('\n')
+
+
+def save_results_to_file(file_name, fit_log, test_results):
+    train_loss_history = fit_log.history['loss']
+    val_loss_history = fit_log.history['val_loss']
+    train_accuracy_history = fit_log.history['accuracy']
+    val_accuracy_history = fit_log.history['val_accuracy']
+
+    file = open(file_name, 'w')
+
+    write_results_to_file(file, train_loss_history, 'train_loss')
+    write_results_to_file(file, val_loss_history, 'val_loss')
+    write_results_to_file(file, train_accuracy_history, 'train_accuracy')
+    write_results_to_file(file, val_accuracy_history, 'val_accuracy')
+
+    file.write(f'test_loss: {test_results[0]}\n')
+    file.write(f'test_accuracy: {test_results[1]}\n')
+
+    file.close()
+
+
 def main():
     x, y = get_x_and_y_from_dataset()
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
@@ -130,10 +156,11 @@ def main():
 
     fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=20, batch_size=64)
 
-    plot_fit_log(fit_log)
+    test_results = model.evaluate(x_test, y_test, verbose=1)
 
-    print('test:')
-    model.evaluate(x_test, y_test, verbose=1)
+    save_results_to_file('results.txt', fit_log, test_results)
+
+    plot_fit_log(fit_log)
 
 
 if __name__ == '__main__':

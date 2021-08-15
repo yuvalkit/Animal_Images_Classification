@@ -10,11 +10,11 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import time
 
-# dataset_path = 'dataset'
-dataset_path = '/content/PracticalML_FinalProject/dataset'
+dataset_path = 'dataset'
+# dataset_path = '/content/PracticalML_FinalProject/dataset'
 
-# dataset_numpy_path = 'dataset_numpy.npz'
-dataset_numpy_path = '/content/drive/MyDrive/PracticalML_FinalProject/dataset_numpy.npz'
+dataset_numpy_path = 'dataset_numpy.npz'
+# dataset_numpy_path = '/content/drive/MyDrive/PracticalML_FinalProject/dataset_numpy.npz'
 
 categories = ['butterfly',
               'cat',
@@ -36,8 +36,12 @@ def get_x_and_y_from_dataset():
     x = []
     y = []
     for category in categories:
+        count = 0
         dir_path = os.path.join(dataset_path, category)
         for file_name in os.listdir(dir_path):
+            if count > 10:
+                break
+            count += 1
             file_path = os.path.join(dir_path, file_name)
             image = cv2.imread(file_path)
             resized_img = cv2.resize(image, (image_size, image_size))
@@ -96,12 +100,48 @@ def plot_fit_metric(fit_log, metric):
     plt.show()
 
 
+def save_fit_metric_plot(fit_log, metric, file_name):
+    plt.plot(fit_log.history[metric])
+    plt.plot(fit_log.history[f'val_{metric}'])
+    plt.title(f'model {metric}')
+    plt.ylabel(metric)
+    plt.xlabel('epoch')
+    plt.legend(['train', 'val'])
+    plt.savefig(file_name)
+
+
 def plot_fit_log(fit_log):
     print()
     plot_fit_metric(fit_log, 'loss')
     print()
     plot_fit_metric(fit_log, 'accuracy')
     print()
+
+
+def write_results_to_file(file, results_arr, title):
+    file.write(f'{title}:\n')
+    for i, elem in enumerate(results_arr):
+        file.write(f'{i + 1}: {elem}\n')
+    file.write('\n')
+
+
+def save_results_to_file(file_name, fit_log, test_results):
+    train_loss_history = fit_log.history['loss']
+    val_loss_history = fit_log.history['val_loss']
+    train_accuracy_history = fit_log.history['accuracy']
+    val_accuracy_history = fit_log.history['val_accuracy']
+
+    file = open(file_name, 'w')
+
+    write_results_to_file(file, train_loss_history, 'train_loss')
+    write_results_to_file(file, val_loss_history, 'val_loss')
+    write_results_to_file(file, train_accuracy_history, 'train_accuracy')
+    write_results_to_file(file, val_accuracy_history, 'val_accuracy')
+
+    file.write(f'test_loss: {test_results[0]}\n')
+    file.write(f'test_accuracy: {test_results[1]}\n')
+
+    file.close()
 
 
 def main():
@@ -115,10 +155,11 @@ def main():
 
     fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=10, batch_size=64)
 
-    plot_fit_log(fit_log)
+    test_results = model.evaluate(x_test, y_test, verbose=1)
 
-    print('test:')
-    model.evaluate(x_test, y_test, verbose=1)
+    save_results_to_file('results.txt', fit_log, test_results)
+
+    plot_fit_log(fit_log)
 
 
 if __name__ == '__main__':
