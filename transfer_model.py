@@ -4,7 +4,6 @@ import cv2
 from tensorflow.keras.applications import ResNet152
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
-from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
