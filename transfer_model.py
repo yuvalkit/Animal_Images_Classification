@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from tensorflow.keras.applications import VGG16
+from tensorflow.keras.applications import VGG16, VGG19, ResNet50, ResNet101, ResNet152
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
 from tensorflow.keras import optimizers
@@ -11,10 +11,6 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
-# dataset_path = '/content/PracticalML_FinalProject/dataset'
-
-dataset_numpy_path = 'dataset_numpy.npz'
-# dataset_numpy_path = '/content/drive/MyDrive/PracticalML_FinalProject/dataset_numpy.npz'
 
 categories = ['butterfly',
               'cat',
@@ -47,9 +43,9 @@ def get_x_and_y_from_dataset():
     return x, y
 
 
-def get_model():
-    pre_trained_model = VGG16(input_shape=(image_size, image_size, num_channels),
-                              include_top=False, weights='imagenet')
+def get_model(keras_application):
+    pre_trained_model = keras_application(input_shape=(image_size, image_size, num_channels),
+                                          include_top=False, weights='imagenet')
 
     pre_trained_model.trainable = False
 
@@ -76,13 +72,17 @@ def write_results_to_file(file, results_arr, title):
     file.write('\n')
 
 
-def save_results_to_file(file_name, fit_log, test_results):
+def save_results_to_file(file_name, fit_log, test_results, keras_application_name):
     train_loss_history = fit_log.history['loss']
     val_loss_history = fit_log.history['val_loss']
     train_accuracy_history = fit_log.history['accuracy']
     val_accuracy_history = fit_log.history['val_accuracy']
 
-    file = open(file_name, 'w')
+    file = open(file_name, 'a')
+
+    file.write('=======================================\n')
+    file.write(f'{keras_application_name}\n')
+    file.write('=======================================\n\n')
 
     write_results_to_file(file, train_loss_history, 'train_loss')
     write_results_to_file(file, val_loss_history, 'val_loss')
@@ -90,7 +90,7 @@ def save_results_to_file(file_name, fit_log, test_results):
     write_results_to_file(file, val_accuracy_history, 'val_accuracy')
 
     file.write(f'test_loss: {test_results[0]}\n')
-    file.write(f'test_accuracy: {test_results[1]}\n')
+    file.write(f'test_accuracy: {test_results[1]}\n\n')
 
     file.close()
 
@@ -114,14 +114,14 @@ def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
     return train_flow, val_flow, test_flow
 
 
-def main():
+def train_and_evaluate_model(keras_application, keras_application_name):
     x, y = get_x_and_y_from_dataset()
     x_train_val, x_test, y_train_val, y_test = train_test_split(x, y, test_size=0.2)
     x_train, x_val, y_train, y_val = train_test_split(x_train_val, y_train_val, test_size=0.2)
 
     train_flow, val_flow, test_flow = get_flows(x_train, x_val, x_test, y_train, y_val, y_test)
 
-    model = get_model()
+    model = get_model(keras_application)
 
     checkpoint_path = 'best_model/checkpoint'
     model_checkpoint = ModelCheckpoint(checkpoint_path,
@@ -130,7 +130,8 @@ def main():
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=50,
+    print(f'starting {keras_application_name} train')
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=100,
                         callbacks=[model_checkpoint])
 
     model.evaluate(test_flow, verbose=1)
@@ -139,7 +140,15 @@ def main():
 
     test_results = model.evaluate(test_flow, verbose=1)
 
-    save_results_to_file('results.txt', fit_log, test_results)
+    save_results_to_file('results.txt', fit_log, test_results, keras_application_name)
+
+
+def main():
+    train_and_evaluate_model(VGG16, 'VGG16')
+    train_and_evaluate_model(VGG19, 'VGG19')
+    train_and_evaluate_model(ResNet50, 'ResNet50')
+    train_and_evaluate_model(ResNet101, 'ResNet101')
+    train_and_evaluate_model(ResNet152, 'ResNet152')
 
 
 if __name__ == '__main__':
