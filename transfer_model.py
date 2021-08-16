@@ -50,17 +50,6 @@ def get_x_and_y_from_dataset():
     return x, y
 
 
-def save_x_and_y_to_file(x, y):
-    np.savez(dataset_numpy_path, x, y)
-
-
-def load_x_and_y_from_file():
-    npz = np.load(dataset_numpy_path)
-    x = npz['arr_0']
-    y = npz['arr_1']
-    return x, y
-
-
 def get_model():
     base_model = ResNet152(input_shape=(image_size, image_size, num_channels),
                            include_top=False, weights='imagenet')
@@ -81,34 +70,6 @@ def get_model():
                   metrics=['accuracy'])
 
     return model
-
-
-def plot_fit_metric(fit_log, metric):
-    plt.plot(fit_log.history[metric])
-    plt.plot(fit_log.history[f'val_{metric}'])
-    plt.title(f'model {metric}')
-    plt.ylabel(metric)
-    plt.xlabel('epoch')
-    plt.legend(['train', 'val'])
-    plt.show()
-
-
-def save_fit_metric_plot(fit_log, metric, file_name):
-    plt.plot(fit_log.history[metric])
-    plt.plot(fit_log.history[f'val_{metric}'])
-    plt.title(f'model {metric}')
-    plt.ylabel(metric)
-    plt.xlabel('epoch')
-    plt.legend(['train', 'val'])
-    plt.savefig(file_name)
-
-
-def plot_fit_log(fit_log):
-    print()
-    plot_fit_metric(fit_log, 'loss')
-    print()
-    plot_fit_metric(fit_log, 'accuracy')
-    print()
 
 
 def write_results_to_file(file, results_arr, title):

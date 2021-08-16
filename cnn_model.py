@@ -6,12 +6,9 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, Dense, Conv2D, 
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
-import time
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
-# dataset_path = '/content/PracticalML_FinalProject/dataset'
-
 
 categories = ['butterfly',
               'cat',
@@ -29,7 +26,6 @@ num_channels = 3
 
 
 def get_x_and_y_from_dataset():
-    start = time.time()
     x = []
     y = []
     for category in categories:
@@ -42,19 +38,6 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
-    end = time.time()
-    print(f'load time: {end - start}')
-    return x, y
-
-
-def save_x_and_y_to_file(x, y, file_path):
-    np.savez(file_path, x, y)
-
-
-def load_x_and_y_from_file(file_path):
-    npz = np.load(file_path)
-    x = npz['arr_0']
-    y = npz['arr_1']
     return x, y
 
 
@@ -101,24 +84,6 @@ def get_model():
     return model
 
 
-def plot_fit_metric(fit_log, metric):
-    plt.plot(fit_log.history[metric])
-    plt.plot(fit_log.history[f'val_{metric}'])
-    plt.title(f'model {metric}')
-    plt.ylabel(metric)
-    plt.xlabel('epoch')
-    plt.legend(['train', 'val'])
-    plt.show()
-
-
-def plot_fit_log(fit_log):
-    print()
-    plot_fit_metric(fit_log, 'loss')
-    print()
-    plot_fit_metric(fit_log, 'accuracy')
-    print()
-
-
 def write_results_to_file(file, results_arr, title):
     file.write(f'{title}:\n')
     for i, elem in enumerate(results_arr):
@@ -150,7 +115,7 @@ def main():
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
     model = get_model()
 
-    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=20, batch_size=64)
+    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=50, batch_size=64)
     test_results = model.evaluate(x_test, y_test, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
