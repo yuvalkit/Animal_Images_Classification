@@ -11,7 +11,10 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 
 from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
+def get_available_devices():
+    local_device_protos = device_lib.list_local_devices()
+    return [x.name for x in local_device_protos]
+print(get_available_devices())
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'
