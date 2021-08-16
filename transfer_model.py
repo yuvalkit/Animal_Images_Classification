@@ -1,13 +1,13 @@
 import os
 import numpy as np
 import cv2
-from tensorflow.keras.applications import ResNet152
+from tensorflow.keras.applications import VGG19
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
-from matplotlib import pyplot as plt
-import time
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
@@ -32,7 +32,6 @@ num_channels = 3
 
 
 def get_x_and_y_from_dataset():
-    start = time.time()
     x = []
     y = []
     for category in categories:
@@ -45,25 +44,23 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
-    end = time.time()
-    print(f'load time: {end - start}')
     return x, y
 
 
 def get_model():
-    base_model = ResNet152(input_shape=(image_size, image_size, num_channels),
-                           include_top=False, weights='imagenet')
+    pre_trained_model = VGG19(input_shape=(image_size, image_size, num_channels),
+                              include_top=False, weights='imagenet')
 
-    base_model.trainable = False
+    pre_trained_model.trainable = False
 
-    x = Flatten()(base_model.output)
+    x = Flatten()(pre_trained_model.output)
     x = Dropout(0.1)(x)
     x = Dense(256, activation='relu')(x)
     x = Dropout(0.1)(x)
 
     outputs = Dense(len(categories), activation='softmax')(x)
 
-    model = Model(inputs=base_model.input, outputs=outputs)
+    model = Model(inputs=pre_trained_model.input, outputs=outputs)
 
     model.compile(optimizer=optimizers.SGD(learning_rate=0.001, momentum=0.9),
                   loss='sparse_categorical_crossentropy',
@@ -98,13 +95,49 @@ def save_results_to_file(file_name, fit_log, test_results):
     file.close()
 
 
+def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
+    train_generator = ImageDataGenerator(samplewise_center=True,
+                                         rotation_range=30,
+                                         width_shift_range=0.1,
+                                         height_shift_range=0.1,
+                                         shear_range=0.2,
+                                         zoom_range=0.2,
+                                         horizontal_flip=True,
+                                         rescale=1/255)
+
+    val_test_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
+
+    train_flow = train_generator.flow(x_train, y_train, batch_size=64)
+    val_flow = val_test_generator.flow(x_val, y_val, batch_size=64)
+    test_flow = val_test_generator.flow(x_test, y_test, batch_size=64)
+
+    return train_flow, val_flow, test_flow
+
+
 def main():
     x, y = get_x_and_y_from_dataset()
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+    x_train_val, x_test, y_train_val, y_test = train_test_split(x, y, test_size=0.2)
+    x_train, x_val, y_train, y_val = train_test_split(x_train_val, y_train_val, test_size=0.2)
+
+    train_flow, val_flow, test_flow = get_flows(x_train, x_val, x_test, y_train, y_val, y_test)
+
     model = get_model()
 
-    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=10, batch_size=64)
-    test_results = model.evaluate(x_test, y_test, verbose=1)
+    checkpoint_path = 'best_model/checkpoint'
+    model_checkpoint = ModelCheckpoint(checkpoint_path,
+                                       monitor="val_accuracy",
+                                       save_best_only=True,
+                                       save_weights_only=True,
+                                       mode='max')
+
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=10,
+                        callbacks=[model_checkpoint])
+
+    model.evaluate(test_flow, verbose=1)
+
+    model.load_weights(checkpoint_path)
+
+    test_results = model.evaluate(test_flow, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
 
