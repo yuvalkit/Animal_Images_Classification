@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from tensorflow.keras.applications import VGG19
+from tensorflow.keras.applications import VGG16
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
 from tensorflow.keras import optimizers
@@ -48,7 +48,7 @@ def get_x_and_y_from_dataset():
 
 
 def get_model():
-    pre_trained_model = VGG19(input_shape=(image_size, image_size, num_channels),
+    pre_trained_model = VGG16(input_shape=(image_size, image_size, num_channels),
                               include_top=False, weights='imagenet')
 
     pre_trained_model.trainable = False
