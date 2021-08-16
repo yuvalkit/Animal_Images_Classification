@@ -115,15 +115,18 @@ def main():
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
     model = get_model()
 
-    checkpoint_path = 'best_model'
+    checkpoint_path = 'best_model/checkpoint'
     model_checkpoint = ModelCheckpoint(checkpoint_path,
                                        monitor="val_accuracy",
                                        save_best_only=True,
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=3, batch_size=64,
+    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=5, batch_size=64,
                         callbacks=[model_checkpoint])
+
+    model.evaluate(x_test, y_test, verbose=1)
+    model.evaluate(x_test, y_test, verbose=1)
 
     model.load_weights(checkpoint_path)
 
