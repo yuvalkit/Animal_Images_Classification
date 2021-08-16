@@ -7,14 +7,6 @@ from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 
-from tensorflow.python.client import device_lib
-def get_available_devices():
-    local_device_protos = device_lib.list_local_devices()
-    return [x.name for x in local_device_protos]
-print(f'GPU IS = {get_available_devices()}')
-print()
-import tensorflow as tf
-print(f'GPU TEST IS = {tf.test.gpu_device_name()}')
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'
