@@ -1,6 +1,6 @@
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+# os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 import numpy as np
 import cv2
@@ -14,10 +14,10 @@ from tensorflow.python.client import device_lib
 def get_available_devices():
     local_device_protos = device_lib.list_local_devices()
     return [x.name for x in local_device_protos]
-print(get_available_devices())
+print(f'GPU IS = {get_available_devices()}')
 print()
 import tensorflow as tf
-print(tf.test.gpu_device_name())
+print(f'GPU TEST IS = {tf.test.gpu_device_name()}')
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'
