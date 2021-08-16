@@ -5,7 +5,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import BatchNormalization, Dropout, Dense, Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
-from matplotlib import pyplot as plt
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
@@ -115,7 +115,18 @@ def main():
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
     model = get_model()
 
-    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=50, batch_size=64)
+    checkpoint_path = 'best_model'
+    model_checkpoint = ModelCheckpoint(checkpoint_path,
+                                       monitor="val_accuracy",
+                                       save_best_only=True,
+                                       save_weights_only=True,
+                                       mode='max')
+
+    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=50, batch_size=64,
+                        callbacks=[model_checkpoint])
+
+    model.load_weights(checkpoint_path)
+
     test_results = model.evaluate(x_test, y_test, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
