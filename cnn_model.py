@@ -8,8 +8,8 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import time
 
-from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
+import tensorflow as tf
+print(tf.test.gpu_device_name())
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
