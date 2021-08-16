@@ -1,4 +1,7 @@
 import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import numpy as np
 import cv2
 from tensorflow.keras.models import Sequential
@@ -7,6 +10,8 @@ from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'

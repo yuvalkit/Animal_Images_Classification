@@ -1,4 +1,7 @@
 import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import numpy as np
 import cv2
 from tensorflow.keras.applications import ResNet152
