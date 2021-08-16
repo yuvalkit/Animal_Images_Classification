@@ -60,7 +60,7 @@ def get_model():
 
     outputs = Dense(len(categories), activation='softmax')(x)
 
-    model = Model(inputs=pre_trained_model.input, outputs=outputs)
+    model = Model(inputs=pre_trained_model.inputs, outputs=outputs)
 
     model.compile(optimizer=optimizers.SGD(learning_rate=0.001, momentum=0.9),
                   loss='sparse_categorical_crossentropy',
