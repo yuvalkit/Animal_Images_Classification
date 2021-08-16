@@ -130,7 +130,7 @@ def main():
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=10,
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=50,
                         callbacks=[model_checkpoint])
 
     model.evaluate(test_flow, verbose=1)
