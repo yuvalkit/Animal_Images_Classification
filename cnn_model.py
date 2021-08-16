@@ -8,9 +8,6 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import time
 
-import tensorflow as tf
-print(tf.test.gpu_device_name())
-
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
 # dataset_path = '/content/PracticalML_FinalProject/dataset'
