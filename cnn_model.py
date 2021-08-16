@@ -6,6 +6,7 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, Dense, Conv2D, 
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
+import time
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
@@ -28,6 +29,7 @@ num_channels = 3
 
 
 def get_x_and_y_from_dataset():
+    start = time.time()
     x = []
     y = []
     for category in categories:
@@ -40,6 +42,8 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
+    end = time.time()
+    print(f'load time: {end - start}')
     return x, y
 
 
