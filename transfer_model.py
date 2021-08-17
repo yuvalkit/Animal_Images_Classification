@@ -56,7 +56,7 @@ def get_model(keras_application):
 
     model = Model(inputs=pre_trained_model.inputs, outputs=outputs)
 
-    model.compile(optimizer=optimizers.Adam(),
+    model.compile(optimizer=optimizers.SGD(learning_rate=0.001, momentum=0.9),
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
