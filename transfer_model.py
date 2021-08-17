@@ -105,11 +105,11 @@ def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
                                          horizontal_flip=True,
                                          rescale=1/255)
 
-    val_test_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
+    test_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
 
     train_flow = train_generator.flow(x_train, y_train, batch_size=64)
-    val_flow = val_test_generator.flow(x_val, y_val, batch_size=64)
-    test_flow = val_test_generator.flow(x_test, y_test, batch_size=64)
+    val_flow = train_generator.flow(x_val, y_val, batch_size=64)
+    test_flow = test_generator.flow(x_test, y_test, batch_size=64)
 
     return train_flow, val_flow, test_flow
 
