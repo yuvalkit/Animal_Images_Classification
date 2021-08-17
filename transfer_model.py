@@ -129,7 +129,6 @@ def train_and_evaluate_model(keras_application, keras_application_name):
                                        save_weights_only=True,
                                        mode='max')
 
-    print(f'starting {keras_application_name} train')
     fit_log = model.fit(train_flow, validation_data=val_flow, epochs=20,
                         callbacks=[model_checkpoint])
 
@@ -143,15 +142,7 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
 
 def main():
-    train_and_evaluate_model(VGG16, 'VGG16')
-    time.sleep(60)
     train_and_evaluate_model(VGG19, 'VGG19')
-    time.sleep(60)
-    train_and_evaluate_model(ResNet50, 'ResNet50')
-    time.sleep(60)
-    train_and_evaluate_model(ResNet101, 'ResNet101')
-    time.sleep(60)
-    train_and_evaluate_model(ResNet152, 'ResNet152')
 
 
 if __name__ == '__main__':
