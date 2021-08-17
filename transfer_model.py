@@ -47,8 +47,6 @@ def get_model(keras_application):
     pre_trained_model = keras_application(input_shape=(image_size, image_size, num_channels),
                                           include_top=False, weights='imagenet')
 
-    # pre_trained_model.trainable = False
-
     x = Flatten()(pre_trained_model.output)
     x = Dropout(0.1)(x)
     x = Dense(256, activation='relu')(x)
@@ -58,7 +56,7 @@ def get_model(keras_application):
 
     model = Model(inputs=pre_trained_model.inputs, outputs=outputs)
 
-    model.compile(optimizer=optimizers.SGD(learning_rate=0.001, momentum=0.9),
+    model.compile(optimizer=optimizers.Adam(),
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
