@@ -24,7 +24,7 @@ categories = ['butterfly',
               'spider',
               'squirrel']
 
-image_size = 224
+image_size = 216
 num_channels = 3
 
 
