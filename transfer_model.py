@@ -146,9 +146,9 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 def main():
     # train_and_evaluate_model(VGG16, 'VGG16')
     # train_and_evaluate_model(VGG19, 'VGG19')
-    train_and_evaluate_model(ResNet50, 'ResNet50')
+    # train_and_evaluate_model(ResNet50, 'ResNet50')
     # train_and_evaluate_model(ResNet101, 'ResNet101')
-    # train_and_evaluate_model(ResNet152, 'ResNet152')
+    train_and_evaluate_model(ResNet152, 'ResNet152')
 
 
 if __name__ == '__main__':
