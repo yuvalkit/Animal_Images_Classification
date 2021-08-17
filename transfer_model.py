@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from tensorflow.keras.applications import VGG16, VGG19, ResNet50, ResNet101, ResNet152
+from tensorflow.keras.applications import VGG16, VGG19, ResNet50, ResNet101, MobileNet
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
 from tensorflow.keras import optimizers
@@ -142,7 +142,7 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
 
 def main():
-    train_and_evaluate_model(ResNet152, 'ResNet152')
+    train_and_evaluate_model(MobileNet, 'MobileNet')
 
 
 if __name__ == '__main__':
