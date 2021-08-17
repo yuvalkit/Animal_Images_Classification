@@ -47,7 +47,7 @@ def get_model(keras_application):
     pre_trained_model = keras_application(input_shape=(image_size, image_size, num_channels),
                                           include_top=False, weights='imagenet')
 
-    pre_trained_model.trainable = False
+    # pre_trained_model.trainable = False
 
     x = Flatten()(pre_trained_model.output)
     x = Dropout(0.1)(x)
@@ -58,7 +58,7 @@ def get_model(keras_application):
 
     model = Model(inputs=pre_trained_model.inputs, outputs=outputs)
 
-    model.compile(optimizer=optimizers.Adam(),
+    model.compile(optimizer=optimizers.SGD(learning_rate=0.001, momentum=0.9),
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
@@ -96,19 +96,19 @@ def save_results_to_file(file_name, fit_log, test_results, keras_application_nam
 
 
 def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
-    train_val_generator = ImageDataGenerator(samplewise_center=True,
-                                             rotation_range=30,
-                                             width_shift_range=0.1,
-                                             height_shift_range=0.1,
-                                             shear_range=0.2,
-                                             zoom_range=0.2,
-                                             horizontal_flip=True,
-                                             rescale=1/255)
+    train_generator = ImageDataGenerator(samplewise_center=True,
+                                         rotation_range=30,
+                                         width_shift_range=0.1,
+                                         height_shift_range=0.1,
+                                         shear_range=0.2,
+                                         zoom_range=0.2,
+                                         horizontal_flip=True,
+                                         rescale=1/255)
 
     test_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
 
-    train_flow = train_val_generator.flow(x_train, y_train, batch_size=64)
-    val_flow = train_val_generator.flow(x_val, y_val, batch_size=64)
+    train_flow = train_generator.flow(x_train, y_train, batch_size=64)
+    val_flow = test_generator.flow(x_val, y_val, batch_size=64)
     test_flow = test_generator.flow(x_test, y_test, batch_size=64)
 
     return train_flow, val_flow, test_flow
@@ -144,11 +144,11 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
 
 def main():
-    # train_and_evaluate_model(VGG16, 'VGG16')
+    train_and_evaluate_model(VGG16, 'VGG16')
     # train_and_evaluate_model(VGG19, 'VGG19')
     # train_and_evaluate_model(ResNet50, 'ResNet50')
     # train_and_evaluate_model(ResNet101, 'ResNet101')
-    train_and_evaluate_model(ResNet152, 'ResNet152')
+    # train_and_evaluate_model(ResNet152, 'ResNet152')
 
 
 if __name__ == '__main__':
