@@ -142,7 +142,7 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
 
 def main():
-    train_and_evaluate_model(ResNet101, 'ResNet101')
+    train_and_evaluate_model(ResNet152, 'ResNet152')
 
 
 if __name__ == '__main__':
