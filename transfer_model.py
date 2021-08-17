@@ -8,6 +8,7 @@ from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
+import time
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
@@ -103,11 +104,11 @@ def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
                                          horizontal_flip=True,
                                          rescale=1/255)
 
-    test_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
+    test_val_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
 
     train_flow = train_generator.flow(x_train, y_train, batch_size=64)
-    val_flow = test_generator.flow(x_val, y_val, batch_size=64)
-    test_flow = test_generator.flow(x_test, y_test, batch_size=64)
+    val_flow = test_val_generator.flow(x_val, y_val, batch_size=64)
+    test_flow = test_val_generator.flow(x_test, y_test, batch_size=64)
 
     return train_flow, val_flow, test_flow
 
@@ -129,7 +130,7 @@ def train_and_evaluate_model(keras_application, keras_application_name):
                                        mode='max')
 
     print(f'starting {keras_application_name} train')
-    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=100,
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=20,
                         callbacks=[model_checkpoint])
 
     model.evaluate(test_flow, verbose=1)
@@ -143,10 +144,14 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
 def main():
     train_and_evaluate_model(VGG16, 'VGG16')
-    # train_and_evaluate_model(VGG19, 'VGG19')
-    # train_and_evaluate_model(ResNet50, 'ResNet50')
-    # train_and_evaluate_model(ResNet101, 'ResNet101')
-    # train_and_evaluate_model(ResNet152, 'ResNet152')
+    time.sleep(60)
+    train_and_evaluate_model(VGG19, 'VGG19')
+    time.sleep(60)
+    train_and_evaluate_model(ResNet50, 'ResNet50')
+    time.sleep(60)
+    train_and_evaluate_model(ResNet101, 'ResNet101')
+    time.sleep(60)
+    train_and_evaluate_model(ResNet152, 'ResNet152')
 
 
 if __name__ == '__main__':
