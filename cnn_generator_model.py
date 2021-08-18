@@ -1,12 +1,15 @@
 import os
 import numpy as np
 import cv2
+import tensorflow
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import BatchNormalization, Dropout, Dense, Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tf_keras_vis.activation_maximization import ActivationMaximization
+from matplotlib import pyplot as plt
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
@@ -130,7 +133,7 @@ def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
     return train_flow, val_flow, test_flow
 
 
-def main():
+def train_and_evaluate_model():
     x, y = get_x_and_y_from_dataset()
     x_train_val, x_test, y_train_val, y_test = train_test_split(x, y, test_size=0.2)
     x_train, x_val, y_train, y_val = train_test_split(x_train_val, y_train_val, test_size=0.2)
@@ -146,7 +149,7 @@ def main():
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=100,
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=5,
                         callbacks=[model_checkpoint])
 
     model.evaluate(test_flow, verbose=1)
@@ -156,6 +159,33 @@ def main():
     test_results = model.evaluate(test_flow, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
+
+    return model
+
+
+def loss(output):
+    return output[0, 0], output[1, 1], output[2, 2], output[3, 3], output[4, 4], output[5, 5], output[6, 6], output[7, 7], output[8, 8], output[9, 9]
+
+
+def model_modifier(m):
+    m.layers[-1].activation = tensorflow.keras.activations.linear
+
+
+def visualize_model(model):
+    visualize_activation = ActivationMaximization(model, model_modifier)
+    seed_input = tensorflow.random.uniform((10, image_size, image_size, 3), 0, 255)
+    activations = visualize_activation(loss, seed_input=seed_input, steps=512)
+    images = [activation.astype(np.float32) for activation in activations]
+    for i in range(0, len(images)):
+        visualization = images[i]
+        plt.imshow((visualization * 255).astype(np.uint8), cmap='gray')
+        plt.title(categories[i])
+        plt.savefig(f'visualizations/{categories[i]}.png')
+
+
+def main():
+    model = train_and_evaluate_model()
+    visualize_model(model)
 
 
 if __name__ == '__main__':

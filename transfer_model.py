@@ -156,11 +156,11 @@ def model_modifier(m):
 def visualize_model(model):
     visualize_activation = ActivationMaximization(model, model_modifier)
     seed_input = tensorflow.random.uniform((10, image_size, image_size, 3), 0, 255)
-    activations = visualize_activation(loss, seed_input=seed_input, steps=512, input_range=(30, 150))
+    activations = visualize_activation(loss, seed_input=seed_input, steps=512)
     images = [activation.astype(np.float32) for activation in activations]
     for i in range(0, len(images)):
         visualization = images[i]
-        plt.imshow(visualization, cmap='gray')
+        plt.imshow((visualization * 255).astype(np.uint8), cmap='gray')
         plt.title(categories[i])
         plt.savefig(f'visualizations/{categories[i]}.png')
 
