@@ -43,6 +43,8 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
+    x = x / 255
+    y = y / 255
     return x, y
 
 
@@ -131,7 +133,7 @@ def train_and_evaluate_model(keras_application, keras_application_name):
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=2,
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=1,
                         callbacks=[model_checkpoint])
 
     model.evaluate(test_flow, verbose=1)
