@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import tensorflow
 from tensorflow.keras.applications import VGG16, VGG19, ResNet50, ResNet101, MobileNet, Xception, InceptionResNetV2, InceptionV3
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
@@ -8,7 +9,8 @@ from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
-import time
+from tf_keras_vis.activation_maximization import ActivationMaximization
+from matplotlib import pyplot as plt
 
 
 dataset_path = '/home/access/yuval_projects/data/Animals-10'
@@ -129,7 +131,7 @@ def train_and_evaluate_model(keras_application, keras_application_name):
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=20,
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=2,
                         callbacks=[model_checkpoint])
 
     model.evaluate(test_flow, verbose=1)
@@ -140,9 +142,32 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
     save_results_to_file('results.txt', fit_log, test_results, keras_application_name)
 
+    return model
+
+
+def loss(output):
+    return output[0, 0], output[1, 1], output[2, 2], output[3, 3], output[4, 4], output[5, 5], output[6, 6], output[7, 7], output[8, 8], output[9, 9]
+
+
+def model_modifier(m):
+    m.layers[-1].activation = tensorflow.keras.activations.linear
+
+
+def visualize_model(model):
+    visualize_activation = ActivationMaximization(model, model_modifier)
+    seed_input = tensorflow.random.uniform((10, image_size, image_size, 3), 0, 255)
+    activations = visualize_activation(loss, seed_input=seed_input, steps=512)
+    images = [activation.astype(np.float32) for activation in activations]
+    for i in range(0, len(images)):
+        visualization = images[i]
+        plt.imshow((visualization * 255).astype(np.uint8), cmap='gray')
+        plt.title(categories[i])
+        plt.savefig(f'visualizations/{categories[i]}.png')
+
 
 def main():
-    train_and_evaluate_model(InceptionV3, 'InceptionV3')
+    model = train_and_evaluate_model(InceptionResNetV2, 'InceptionResNetV2')
+    visualize_model(model)
 
 
 if __name__ == '__main__':
