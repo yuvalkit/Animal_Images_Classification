@@ -43,8 +43,6 @@ def get_x_and_y_from_dataset():
             y.append(categories.index(category))
     x = np.array(x).reshape((-1, image_size, image_size, num_channels))
     y = np.array(y)
-    x = x / 255
-    y = y / 255
     return x, y
 
 
@@ -158,7 +156,7 @@ def model_modifier(m):
 def visualize_model(model):
     visualize_activation = ActivationMaximization(model, model_modifier)
     seed_input = tensorflow.random.uniform((10, image_size, image_size, 3), 0, 255)
-    activations = visualize_activation(loss, seed_input=seed_input, steps=512)
+    activations = visualize_activation(loss, seed_input=seed_input, steps=512, input_range=(30, 150))
     images = [activation.astype(np.float32) for activation in activations]
     for i in range(0, len(images)):
         visualization = images[i]
