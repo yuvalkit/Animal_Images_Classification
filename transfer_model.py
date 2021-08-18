@@ -160,7 +160,7 @@ def visualize_model(model):
     images = [activation.astype(np.float32) for activation in activations]
     for i in range(0, len(images)):
         visualization = images[i]
-        plt.imshow(visualization.astype(np.uint8), cmap='gray')
+        plt.imshow(visualization, cmap='gray')
         plt.title(categories[i])
         plt.savefig(f'visualizations/{categories[i]}.png')
 
