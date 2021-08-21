@@ -113,15 +113,16 @@ def save_results_to_file(file_name, fit_log, test_results):
 
 def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
     train_generator = ImageDataGenerator(samplewise_center=True,
+                                         samplewise_std_normalization=True,
                                          rotation_range=30,
                                          width_shift_range=0.1,
                                          height_shift_range=0.1,
-                                         shear_range=0.2,
+                                         brightness_range=[0.7, 1.3],
+                                         shear_range=20,
                                          zoom_range=0.2,
-                                         horizontal_flip=True,
-                                         rescale=1/255)
+                                         horizontal_flip=True)
 
-    val_test_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
+    val_test_generator = ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True)
 
     train_flow = train_generator.flow(x_train, y_train, batch_size=64)
     val_flow = val_test_generator.flow(x_val, y_val, batch_size=64)
