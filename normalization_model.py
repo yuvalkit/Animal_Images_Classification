@@ -116,9 +116,7 @@ def main():
     x_train_val, x_test, y_train_val, y_test = train_test_split(x, y, test_size=0.2)
     x_train, x_val, y_train, y_val = train_test_split(x_train_val, y_train_val, test_size=0.2)
 
-    generator = ImageDataGenerator(featurewise_center=True, featurewise_std_normalization=True)
-
-    generator.fit(x_train)
+    generator = ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True)
 
     train_flow = generator.flow(x_train, y_train, batch_size=64)
     val_flow = generator.flow(x_val, y_val, batch_size=64)
@@ -138,7 +136,7 @@ def main():
 
     model.load_weights(checkpoint_path)
 
-    test_results = model.evaluate_generator(test_flow, verbose=1)
+    test_results = model.evaluate(test_flow, verbose=1)
 
     save_results_to_file('results.txt', fit_log, test_results)
 
