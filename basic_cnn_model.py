@@ -43,25 +43,25 @@ def get_x_and_y_from_dataset():
 
 def get_model():
     model = Sequential([
-        Conv2D(filters=64, kernel_size=(3, 3), activation='relu',
+        Conv2D(filters=128, kernel_size=(3, 3), activation='relu',
                input_shape=(image_size, image_size, num_channels)),
 
-        Conv2D(filters=128, kernel_size=(3, 3), activation='relu'),
+        Conv2D(filters=256, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D((2, 2)),
 
-        Conv2D(filters=128, kernel_size=(3, 3), activation='relu'),
+        Conv2D(filters=256, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D((2, 2)),
 
         Flatten(),
 
-        Dense(128, activation='relu'),
+        Dense(256, activation='relu'),
 
-        Dense(32, activation='relu'),
+        Dense(128, activation='relu'),
 
         Dense(len(categories), activation='softmax')
     ])
 
-    model.compile(optimizer=optimizers.SGD(learning_rate=0.001),
+    model.compile(optimizer=optimizers.Adam(),
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
