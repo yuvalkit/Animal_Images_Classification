@@ -59,7 +59,7 @@ def get_model():
         Dense(len(categories), activation='softmax')
     ])
 
-    model.compile(optimizer=optimizers.SGD(learning_rate=0.01),
+    model.compile(optimizer=optimizers.SGD(learning_rate=0.001),
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
