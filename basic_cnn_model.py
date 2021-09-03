@@ -46,17 +46,17 @@ def get_model():
         Conv2D(filters=128, kernel_size=(3, 3), activation='relu',
                input_shape=(image_size, image_size, num_channels)),
 
-        Conv2D(filters=64, kernel_size=(3, 3), activation='relu'),
+        Conv2D(filters=256, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D((2, 2)),
 
-        Conv2D(filters=32, kernel_size=(3, 3), activation='relu'),
+        Conv2D(filters=512, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D((2, 2)),
 
         Flatten(),
 
-        Dense(128, activation='relu'),
+        Dense(256, activation='relu'),
 
-        Dense(64, activation='relu'),
+        Dense(128, activation='relu'),
 
         Dense(len(categories), activation='softmax')
     ])
