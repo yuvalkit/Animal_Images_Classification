@@ -45,15 +45,19 @@ def get_model():
     model = Sequential([
         Conv2D(filters=32, kernel_size=(3, 3), activation='relu',
                input_shape=(image_size, image_size, num_channels)),
+        Dropout(0.2),
         BatchNormalization(),
 
         Conv2D(filters=64, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D((2, 2)),
+        Dropout(0.2),
         BatchNormalization(),
 
         Flatten(),
+        Dropout(0.2),
 
         Dense(32, activation='relu'),
+        Dropout(0.2),
         BatchNormalization(),
 
         Dense(len(categories), activation='softmax')
