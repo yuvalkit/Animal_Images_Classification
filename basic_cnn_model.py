@@ -108,7 +108,7 @@ def main():
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=50, batch_size=64,
+    fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=100, batch_size=64,
                         callbacks=[model_checkpoint])
 
     model.evaluate(x_test, y_test, verbose=1)
