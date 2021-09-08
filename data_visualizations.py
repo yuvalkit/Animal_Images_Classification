@@ -75,7 +75,7 @@ def plot_one_image_per_class():
             resized_image = image.resize((224, 224))
             image.close()
             fig.add_subplot(rows, columns, i + 1)
-            plt.title(dir_name)
+            plt.title(dir_name, fontsize='xx-large')
             plt.imshow(resized_image)
     plt.show()
 
