@@ -9,7 +9,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
-dataset_path = '/home/access/yuval_projects/data/Animals-10'
+dataset_path = 'Animals-10'
 
 categories = ['butterfly',
               'cat',
@@ -111,16 +111,32 @@ def save_results_to_file(file_name, fit_log, test_results):
     file.close()
 
 
+def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
+    train_generator = ImageDataGenerator(samplewise_center=True,
+                                         samplewise_std_normalization=True,
+                                         rotation_range=30,
+                                         width_shift_range=0.1,
+                                         height_shift_range=0.1,
+                                         brightness_range=[0.7, 1.3],
+                                         shear_range=20,
+                                         zoom_range=0.2,
+                                         horizontal_flip=True)
+
+    val_test_generator = ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True)
+
+    train_flow = train_generator.flow(x_train, y_train, batch_size=64)
+    val_flow = val_test_generator.flow(x_val, y_val, batch_size=64)
+    test_flow = val_test_generator.flow(x_test, y_test, batch_size=64)
+
+    return train_flow, val_flow, test_flow
+
+
 def main():
     x, y = get_x_and_y_from_dataset()
     x_train_val, x_test, y_train_val, y_test = train_test_split(x, y, test_size=0.2)
     x_train, x_val, y_train, y_val = train_test_split(x_train_val, y_train_val, test_size=0.2)
 
-    generator = ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True)
-
-    train_flow = generator.flow(x_train, y_train, batch_size=64)
-    val_flow = generator.flow(x_val, y_val, batch_size=64)
-    test_flow = generator.flow(x_test, y_test, batch_size=64)
+    train_flow, val_flow, test_flow = get_flows(x_train, x_val, x_test, y_train, y_val, y_test)
 
     model = get_model()
 
@@ -131,8 +147,8 @@ def main():
                                        save_weights_only=True,
                                        mode='max')
 
-    fit_log = model.fit_generator(train_flow, validation_data=val_flow, epochs=100,
-                                  callbacks=[model_checkpoint])
+    fit_log = model.fit(train_flow, validation_data=val_flow, epochs=100,
+                        callbacks=[model_checkpoint])
 
     model.load_weights(checkpoint_path)
 

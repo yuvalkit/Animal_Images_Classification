@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import ModelCheckpoint
 
 
-dataset_path = '/home/access/yuval_projects/data/Animals-10'
+dataset_path = 'Animals-10'
 
 categories = ['butterfly',
               'cat',
@@ -43,12 +43,22 @@ def get_x_and_y_from_dataset():
 
 def get_model():
     model = Sequential([
-        Conv2D(filters=32, kernel_size=(3, 3), activation='relu',
+        Conv2D(filters=128, kernel_size=(3, 3), activation='relu',
                input_shape=(image_size, image_size, num_channels)),
         Dropout(0.2),
         BatchNormalization(),
 
-        Conv2D(filters=64, kernel_size=(3, 3), activation='relu'),
+        Conv2D(filters=256, kernel_size=(3, 3), activation='relu'),
+        MaxPooling2D((2, 2)),
+        Dropout(0.2),
+        BatchNormalization(),
+
+        Conv2D(filters=512, kernel_size=(3, 3), activation='relu'),
+        MaxPooling2D((2, 2)),
+        Dropout(0.2),
+        BatchNormalization(),
+
+        Conv2D(filters=512, kernel_size=(3, 3), activation='relu'),
         MaxPooling2D((2, 2)),
         Dropout(0.2),
         BatchNormalization(),
@@ -56,7 +66,11 @@ def get_model():
         Flatten(),
         Dropout(0.2),
 
-        Dense(32, activation='relu'),
+        Dense(512, activation='relu'),
+        Dropout(0.2),
+        BatchNormalization(),
+
+        Dense(128, activation='relu'),
         Dropout(0.2),
         BatchNormalization(),
 
@@ -110,8 +124,6 @@ def main():
 
     fit_log = model.fit(x_train, y_train, validation_split=0.2, epochs=100, batch_size=64,
                         callbacks=[model_checkpoint])
-
-    model.evaluate(x_test, y_test, verbose=1)
 
     model.load_weights(checkpoint_path)
 

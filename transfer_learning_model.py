@@ -10,7 +10,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import ModelCheckpoint
 
 
-dataset_path = '/home/access/yuval_projects/data/Animals-10'
+dataset_path = 'Animals-10'
 
 categories = ['butterfly',
               'cat',
@@ -95,15 +95,16 @@ def save_results_to_file(file_name, fit_log, test_results, keras_application_nam
 
 def get_flows(x_train, x_val, x_test, y_train, y_val, y_test):
     train_generator = ImageDataGenerator(samplewise_center=True,
+                                         samplewise_std_normalization=True,
                                          rotation_range=30,
                                          width_shift_range=0.1,
                                          height_shift_range=0.1,
-                                         shear_range=0.2,
+                                         brightness_range=[0.7, 1.3],
+                                         shear_range=20,
                                          zoom_range=0.2,
-                                         horizontal_flip=True,
-                                         rescale=1/255)
+                                         horizontal_flip=True)
 
-    test_val_generator = ImageDataGenerator(samplewise_center=True, rescale=1/255)
+    test_val_generator = ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True)
 
     train_flow = train_generator.flow(x_train, y_train, batch_size=64)
     val_flow = test_val_generator.flow(x_val, y_val, batch_size=64)
@@ -131,8 +132,6 @@ def train_and_evaluate_model(keras_application, keras_application_name):
     fit_log = model.fit(train_flow, validation_data=val_flow, epochs=20,
                         callbacks=[model_checkpoint])
 
-    model.evaluate(test_flow, verbose=1)
-
     model.load_weights(checkpoint_path)
 
     test_results = model.evaluate(test_flow, verbose=1)
@@ -141,6 +140,13 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 
 
 def main():
+    train_and_evaluate_model(VGG16, 'VGG16')
+    train_and_evaluate_model(VGG19, 'VGG19')
+    train_and_evaluate_model(ResNet50, 'ResNet50')
+    train_and_evaluate_model(ResNet101, 'ResNet101')
+    train_and_evaluate_model(MobileNet, 'MobileNet')
+    train_and_evaluate_model(Xception, 'Xception')
+    train_and_evaluate_model(InceptionResNetV2, 'InceptionResNetV2')
     train_and_evaluate_model(InceptionV3, 'InceptionV3')
 
 
