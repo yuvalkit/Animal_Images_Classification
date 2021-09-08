@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from tensorflow.keras.applications import VGG16, VGG19, ResNet50, ResNet101, MobileNet, Xception, InceptionResNetV2, InceptionV3
+from tensorflow.keras.applications import VGG16, VGG19, MobileNet, ResNet50, ResNet101, InceptionV3, InceptionResNetV2, Xception
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D
 from tensorflow.keras import optimizers
@@ -142,12 +142,12 @@ def train_and_evaluate_model(keras_application, keras_application_name):
 def main():
     train_and_evaluate_model(VGG16, 'VGG16')
     train_and_evaluate_model(VGG19, 'VGG19')
+    train_and_evaluate_model(MobileNet, 'MobileNet')
     train_and_evaluate_model(ResNet50, 'ResNet50')
     train_and_evaluate_model(ResNet101, 'ResNet101')
-    train_and_evaluate_model(MobileNet, 'MobileNet')
-    train_and_evaluate_model(Xception, 'Xception')
-    train_and_evaluate_model(InceptionResNetV2, 'InceptionResNetV2')
     train_and_evaluate_model(InceptionV3, 'InceptionV3')
+    train_and_evaluate_model(InceptionResNetV2, 'InceptionResNetV2')
+    train_and_evaluate_model(Xception, 'Xception')
 
 
 if __name__ == '__main__':
