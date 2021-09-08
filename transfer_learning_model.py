@@ -49,6 +49,7 @@ def get_model(keras_application):
 
     x = Flatten()(pre_trained_model.output)
     x = Dropout(0.1)(x)
+
     x = Dense(256, activation='relu')(x)
     x = Dropout(0.1)(x)
 
