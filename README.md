@@ -1,6 +1,6 @@
 # Animal_Images_Classification
 
-This repository contatins all the code of the "Animal Images Classification" project that is submitted as a final project report of the course "Practical Topics in Machine Learning".
+This repository contatins all the relevant code of the "Animal Images Classification" project that is submitted as a final project report in the course "Practical Topics in Machine Learning".
 
 Each file is an independent file which runs on its own.
 
